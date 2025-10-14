@@ -1,0 +1,217 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.008212991813733651 0.9994361055579979 0.03255791259478935 0.4948169636112392
+  position -3.8511154440984265 0.10725654195699974 2.1377012123713186
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 10 10
+}
+Solid {
+  translation -5 0 0.5
+  children [
+    DEF Muro_Forma Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.2 10 1
+      }
+    }
+  ]
+  boundingObject USE Muro_Forma
+}
+Solid {
+  translation 5 0 0.5
+  children [
+    USE Muro_Forma
+  ]
+  name "solid(1)"
+  boundingObject USE Muro_Forma
+}
+Solid {
+  translation 0 -5 0.5
+  rotation 0 0 1 1.5708
+  children [
+    USE Muro_Forma
+  ]
+  name "solid(2)"
+  boundingObject USE Muro_Forma
+}
+Solid {
+  translation 0 5 0.5
+  rotation 0 0 1 1.5708
+  children [
+    USE Muro_Forma
+  ]
+  name "solid(3)"
+  boundingObject USE Muro_Forma
+}
+Robot {
+  translation 0 0 0.05
+  children [
+    InertialUnit {
+      translation -0.05 0 0.075
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 1 1 0
+          }
+          geometry Box {
+            size 0.1 0.1 0.1
+          }
+        }
+      ]
+      name "orientacion"
+    }
+    DEF WHEEL1 HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor 0.05 0.06 0
+      }
+      device [
+        RotationalMotor {
+          name "ruedaDelanteraIzquierda"
+        }
+      ]
+      endPoint Solid {
+        translation 0.05 0.06 0
+        rotation 1 0 0 1.5708
+        children [
+          DEF WHEEL Shape {
+            appearance PBRAppearance {
+              baseColor 0 0.666667 0
+              roughness 1
+            }
+            geometry Cylinder {
+              height 0.02
+              radius 0.04
+              subdivision 24
+            }
+          }
+        ]
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF CUERPO_ROBOT Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.2 0.1 0.05
+      }
+    }
+    DEF WHEEL2 HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor 0.05 -0.06 0
+      }
+      device [
+        RotationalMotor {
+          name "ruedaDelanteraDerecha"
+        }
+      ]
+      endPoint Solid {
+        translation 0.05 -0.06 0
+        rotation 1 0 0 1.5708
+        children [
+          USE WHEEL
+        ]
+        name "solid(1)"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF WHEEL3 HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor -0.05 0.06 0
+      }
+      device [
+        RotationalMotor {
+          name "ruedaTraseraIzquierda"
+        }
+      ]
+      endPoint Solid {
+        translation -0.05 0.06 0
+        rotation 0.9999999999999999 0 0 1.5728
+        children [
+          USE WHEEL
+        ]
+        name "solid(2)"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF WHEEL4 HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor -0.05 -0.06 0
+      }
+      device [
+        RotationalMotor {
+          name "ruedaTraseraDerecha"
+        }
+      ]
+      endPoint Solid {
+        translation -0.05 -0.06 0
+        rotation 1 0 0 1.5708
+        children [
+          USE WHEEL
+        ]
+        name "solid(3)"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DistanceSensor {
+      translation 0.1 -0.03 0
+      rotation 0 0 1 -0.3
+      children [
+        DEF SENSORES_FORMA Shape {
+          appearance PBRAppearance {
+            baseColor 0 0.333333 1
+            roughness 1
+            metalness 0
+          }
+          geometry Box {
+            size 0.01 0.01 0.01
+          }
+        }
+      ]
+      name "ds_right"
+    }
+    DistanceSensor {
+      translation 0.1 0.03 0
+      rotation 0 0 1 0.3
+      children [
+        USE SENSORES_FORMA
+      ]
+      name "ds_left"
+    }
+  ]
+  boundingObject USE CUERPO_ROBOT
+  physics Physics {
+    mass 1
+  }
+  controller "PrimerosPasos"
+}
