@@ -1,0 +1,116 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/rocks/protos/Rock.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "../protos/TractorAutonomo.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.0014414566465631067 -0.9999723670748801 0.007292961634135127 5.894875694298791
+  position -4.554712521000103 -0.3274597812596041 3.2307816047799816
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+Floor {
+  name "floor(1)"
+  size 50 50
+}
+Rock {
+  translation 14.6158 1.15521 0.67
+  name "rock(3)"
+  scale 15
+}
+DEF WALL_1 Solid {
+  translation 25 0 3
+  children [
+    DEF WALL_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColor 0.8 0.8 0.8
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 1 50 6
+      }
+    }
+  ]
+  name "solid(1)"
+  boundingObject USE WALL_SHAPE
+}
+DEF WALL_2 Solid {
+  translation -25 0 3
+  children [
+    USE WALL_SHAPE
+  ]
+  name "solid(2)"
+  boundingObject USE WALL_SHAPE
+}
+DEF WALL_3 Solid {
+  translation 0 -25 3
+  rotation 0 0 1 1.5708
+  children [
+    USE WALL_SHAPE
+  ]
+  name "solid(3)"
+  boundingObject USE WALL_SHAPE
+}
+DEF WALL_4 Solid {
+  translation 0 25 3
+  rotation 0 0 1 1.5708
+  children [
+    USE WALL_SHAPE
+  ]
+  name "solid(4)"
+  boundingObject USE WALL_SHAPE
+}
+TractorAutonomo {
+  translation 0 0 0
+  controller "ControladorTractor"
+  sensorSlot [
+    DistanceSensor {
+      translation 2.13 0.33 0.7
+      rotation 0 0 1 0.3
+      children [
+        DEF DEF_FormaDS Shape {
+          geometry Box {
+            size 0.01 0.02 0.03
+          }
+        }
+      ]
+      name "ds_izquierda"
+      boundingObject USE DEF_FormaDS
+    }
+    DistanceSensor {
+      translation 2.13 -0.33 0.7
+      rotation 0 0 1 -0.3
+      children [
+        USE DEF_FormaDS
+      ]
+      name "ds_derecho"
+      boundingObject USE DEF_FormaDS
+    }
+    InertialUnit {
+    }
+    GPS {
+      translation 1.5 0 1
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.52549 0.584314 0.784314
+            roughness 1
+            metalness 0
+          }
+          geometry Cone {
+            bottomRadius 0.1
+            height 0.1
+          }
+        }
+      ]
+    }
+  ]
+}

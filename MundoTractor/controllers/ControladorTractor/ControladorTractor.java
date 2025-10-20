@@ -4,11 +4,9 @@ public class ControladorTractor {
     // Crear el tractor autónomo
     TractorAutonomo tractor = new TractorAutonomo();
 
-    // Ejecutar el comportamiento
-    tractor.avanzar(); // se mueve recto
-    tractor.girar(45);
-    tractor.marchaAtras();
-    tractor.avanzar();
-    tractor.frenar();
+    //DetectarSensores.detectar();
+
+    tractor.girar(-Math.PI/2);
+
   }
 }
