@@ -18,7 +18,7 @@ public class Apoyo {
         return angle;
     }
 
-        /**
+    /**
      * Calcula la distancia entre dos puntos representados por arrays de tres
      * coordenadas.
      * 
@@ -31,6 +31,14 @@ public class Apoyo {
         double y2 = (start[1] - end[1]) * (start[1] - end[1]);
         double z2 = (start[2] - end[2]) * (start[2] - end[2]);
         return Math.sqrt(x2 + y2 + z2);
+    }
+
+    public static double calcularAnguloHaciaObjetivo(double[] posicionActual, double[] posicionObjetivo) {
+        double dx = posicionObjetivo[0] - posicionActual[0];
+        double dy = posicionObjetivo[1] - posicionActual[1];
+
+        // atan2(dy, dx) devuelve el ángulo desde el eje X positivo
+        return Math.atan2(dy, dx);
     }
 
 }

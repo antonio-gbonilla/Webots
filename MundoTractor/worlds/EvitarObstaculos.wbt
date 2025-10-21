@@ -9,8 +9,8 @@ EXTERNPROTO "../protos/TractorAutonomo.proto"
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.0014414566465631067 -0.9999723670748801 0.007292961634135127 5.894875694298791
-  position -4.554712521000103 -0.3274597812596041 3.2307816047799816
+  orientation -0.019117382387681185 0.05318243351484491 0.9984018001065915 0.6913358974283238
+  position 2.7418489396913612 -19.12494653936031 1.9388400293407422
 }
 TexturedBackground {
 }
@@ -21,7 +21,7 @@ Floor {
   size 50 50
 }
 Rock {
-  translation 14.6158 1.15521 0.67
+  translation 21.8697 -10.674 0.67
   name "rock(3)"
   scale 15
 }
@@ -69,12 +69,12 @@ DEF WALL_4 Solid {
   boundingObject USE WALL_SHAPE
 }
 TractorAutonomo {
-  translation 0 0 0
+  translation 10.5771 -10.2868 0
+  rotation 0 1 0 0
   controller "ControladorTractor"
   sensorSlot [
     DistanceSensor {
-      translation 2.13 0.33 0.7
-      rotation 0 0 1 0.3
+      translation 4.13 0.33 0.7
       children [
         DEF DEF_FormaDS Shape {
           geometry Box {
@@ -82,22 +82,30 @@ TractorAutonomo {
           }
         }
       ]
-      name "ds_izquierda"
+      name "ds_left"
       boundingObject USE DEF_FormaDS
     }
     DistanceSensor {
-      translation 2.13 -0.33 0.7
-      rotation 0 0 1 -0.3
+      translation 4.13 -0.33 0.7
       children [
         USE DEF_FormaDS
       ]
-      name "ds_derecho"
+      name "ds_right"
+      boundingObject USE DEF_FormaDS
+    }
+    DistanceSensor {
+      translation -2 0 0.5
+      children [
+        USE DEF_FormaDS
+      ]
+      name "ds_trasero"
       boundingObject USE DEF_FormaDS
     }
     InertialUnit {
+      name "orientacion"
     }
     GPS {
-      translation 1.5 0 1
+      translation 1.6 0 0.79
       children [
         Shape {
           appearance PBRAppearance {
@@ -106,8 +114,8 @@ TractorAutonomo {
             metalness 0
           }
           geometry Cone {
-            bottomRadius 0.1
-            height 0.1
+            bottomRadius 0.01
+            height 0.01
           }
         }
       ]

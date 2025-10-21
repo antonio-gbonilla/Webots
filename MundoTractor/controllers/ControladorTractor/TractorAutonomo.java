@@ -16,7 +16,7 @@ public class TractorAutonomo extends Car {
     private final double OBSTACLE_DISTANCE = 950.0;
 
     // Maxima velocidad de los motores de las ruedas
-    private double MAX_VELOCITY = 10.0;
+    private double MAX_VELOCITY = 7.0;
 
     // Sensores de distancia del vehículo. Tiene 2 en la parte delantera.
     private DistanceSensor[] ds;
@@ -36,13 +36,13 @@ public class TractorAutonomo extends Car {
     public TractorAutonomo() {
         super();
         timeStep = (int) getBasicTimeStep(); // Se corta la parte decima 1.9 = 1
-        System.out.println(timeStep);
         initSesores();
+        esperar(500); // Da un tiempo para que se inicialicen los sensores.
     }
 
     private void initSesores() {
-        ds = new DistanceSensor[2];
-        String[] nombreDS = { "ds_left", "ds_right" };
+        ds = new DistanceSensor[3];
+        String[] nombreDS = { "ds_left", "ds_right", "ds_trasero" };
         for (int i = 0; i < ds.length; i++) {
             ds[i] = getDistanceSensor(nombreDS[i]);
             /**
@@ -64,20 +64,6 @@ public class TractorAutonomo extends Car {
     }
 
     /**
-     * Hace que el tractor avance recto durante un tiempo determinado.
-     * La velocidad y la dirección se pueden ajustar dentro del método.
-     */
-    /*
-     * kk
-     * public void avanzar() {
-     * double velocidad = 5.0;
-     * setCruisingSpeed(velocidad); // Avanzas velocidad Crucero
-     * setSteeringAngle(0.0); // Angulo en el que giran las ruedas
-     * esperar(2000);
-     * }
-     */
-
-    /**
      * Detiene el tractor completamente usando freno realista.
      */
     public void frenar() {
@@ -94,13 +80,35 @@ public class TractorAutonomo extends Car {
     }
 
     /**
-     * Hace que el tractor avance hacia atrás usando la marcha atrás real.
+     * Hace que el tractor retroceda durante 1 segundo,
+     * pero se detiene inmediatamente si detecta un obstáculo trasero.
      */
     public void marchaAtras() {
+        System.out.println("Iniciando marcha atrás...");
+
         setSteeringAngle(0.0);
-        setCruisingSpeed(-5.0); // velocidad negativa = marcha atrás
-        esperar(2000);
-        setCruisingSpeed(0.0);
+        setCruisingSpeed(-3.0); // velocidad negativa = marcha atrás
+
+        int tiempoTotal = 5000; // duración total en ms
+        int tiempoTranscurrido = 0;
+
+        while (step(timeStep) != -1) {
+            tiempoTranscurrido += timeStep;
+
+            // Comprobamos si hay obstáculo detrás
+            if (hasObstacleBack()) {
+                System.out.println("Obstáculo detectado detrás. Deteniendo marcha atrás.");
+                frenar();
+                return;
+            }
+
+            if (tiempoTranscurrido >= tiempoTotal) {
+                break;
+            }
+        }
+
+        frenar();
+        System.out.println("Marcha atrás completada sin obstáculos.");
     }
 
     /**
@@ -120,7 +128,7 @@ public class TractorAutonomo extends Car {
         double startYaw = anguloActual(); // Ángulo inicial del tractor (radianes)
         double anguloRotado = 0.0; // Ángulo acumulado que el tractor ha girado
 
-        setCruisingSpeed(5.0);
+        setCruisingSpeed(2.0);
 
         /**
          * IMPORTANTE: setSteeringAngle(angle) no "coloca" el vehículo en un ángulo
@@ -138,6 +146,11 @@ public class TractorAutonomo extends Car {
         setSteeringAngle(steering);
 
         while (step(timeStep) != -1) {
+            if (hasObstacleFront()) {
+                System.out.println("Obstáculo detectado. Deteniendo el tractor...");
+                frenar();
+                return; // Sale del metodo no solo del bucle while
+            }
             // Leo la orientacion actual a cada step y la normalizo para que este entre [-π,
             // π)
             double currentYaw = anguloActual();
@@ -164,8 +177,6 @@ public class TractorAutonomo extends Car {
 
     }
 
-    
-    
     /**
      * Mantiene la simulación activa durante el tiempo especificado.
      * 
@@ -180,17 +191,125 @@ public class TractorAutonomo extends Car {
     }
 
     /**
-     * termina si alguno de los DistanceSensor del vehículo detecta un obstáculo
+     * Hace avanzar el tractor a una velocidad específica hasta recorrer una
+     * distancia determinada.
+     * El método controla el movimiento del tractor mediante el GPS para medir la
+     * distancia recorrida
+     * desde el punto de inicio hasta que alcanza la distancia objetivo.
+     * 
+     * @param velocidad Velocidad deseada para el avance en m/s. Si excede
+     *                  MAX_VELOCITY,
+     *                  se limita automáticamente a dicho valor máximo.
+     * @param distancia Distancia objetivo a recorrer en metros. El método se
+     *                  detendrá
+     *                  cuando el tractor haya recorrido esta distancia.
+     */
+    public void avanzar(double velocidad, double distancia) {
+        double[] posicionInicial = gps.getValues();
+        if (MAX_VELOCITY > velocidad)
+            setCruisingSpeed(velocidad);
+        else
+            setCruisingSpeed(MAX_VELOCITY);
+
+        while (step(timeStep) != -1) {
+
+            if (hasObstacleFront()) {
+                System.out.println("Obstáculo detectado. Deteniendo el tractor...");
+                frenar();
+                marchaAtras();
+                return; // Sale del metodo no solo del bucle while
+            }
+            double[] posicionActual = gps.getValues();
+
+            // Calcula cuánto se ha movido el robot desde su posición inicial.
+            double distanciaRecorrida = Apoyo.distance(posicionInicial, posicionActual);
+
+            System.out.printf("Distancia recorrida: %.2f / %.2f m%n", distanciaRecorrida, distancia);
+
+            if (distanciaRecorrida >= distancia) {
+                break;
+            }
+        }
+
+        frenar();
+    }
+
+    public void irAPosicion(double targetX, double targetY, double targetZ, double velocidad) {
+        // 1. Obtener posición actual (reutilizando verificación GPS)
+        double[] posicionActual = gps.getValues();
+        double[] posicionObjetivo = { targetX, targetY, targetZ };
+
+        System.out.printf("Posición actual: [%.2f, %.2f, %.2f]%n",
+                posicionActual[0], posicionActual[1], posicionActual[2]);
+        System.out.printf("Posición objetivo: [%.2f, %.2f, %.2f]%n",
+                targetX, targetY, targetZ);
+
+        // 2. Calcular distancia al objetivo (reutilizando lógica de distancia)
+        double distanciaAlObjetivo = Apoyo.distance(posicionActual, posicionObjetivo);
+        System.out.printf("Distancia al objetivo: %.2f metros%n", distanciaAlObjetivo);
+
+        // Si ya estamos muy cerca, no hacer nada
+        if (distanciaAlObjetivo < 0.3) {
+            System.out.println("Ya está en la posición objetivo o muy cerca");
+            return;
+        }
+
+        // 3. Calcular ángulo hacia el objetivo
+        double anguloHaciaObjetivo = Apoyo.calcularAnguloHaciaObjetivo(posicionActual, posicionObjetivo);
+        System.out.printf("Ángulo hacia el objetivo: %.2f radianes (%.2f grados)%n",
+                anguloHaciaObjetivo, Math.toDegrees(anguloHaciaObjetivo));
+
+        System.out.println("------------------------------------\n --------------------\n----------------");
+        System.out.println("Angulo hacia el objetivo = " + anguloHaciaObjetivo);
+        System.out.println("------------------------------------\n --------------------\n----------------");
+
+        // 4. Orientarse hacia el objeto
+        double anguloActual = anguloActual();
+        double diferenciaAngular = Apoyo.normalizeAngle(anguloHaciaObjetivo - anguloActual);
+
+        System.out.printf("Orientación actual: %.2f rad | Diferencia angular: %.2f rad%n",
+                anguloActual, diferenciaAngular);
+
+        // Solo girar si la diferencia es significativa
+        if (Math.abs(diferenciaAngular) > 0.05) { // Umbral de ~2.8 grados
+            System.out.println("Girando hacia el objetivo...");
+            girar(diferenciaAngular);
+        } else {
+            System.out.println("Ya está orientado hacia el objetivo");
+        }
+
+        // 5. Avanzar hasta la posicion objetivo
+        System.out.println("Avanzando hacia el objetivo...");
+        avanzar(velocidad, distanciaAlObjetivo);
+
+        System.out.println("¡Posición objetivo alcanzada!");
+
+    }
+
+    /**
+     * termina si alguno de los DistanceSensor delanteros del vehículo detecta un
+     * obstáculo
      * a distancia menor que OBSTACLE_DISTANCE.
      * 
      * @return true si hay obstaculo, false si no lo hay
      */
-
-    private boolean hasObstacle() {
+    private boolean hasObstacleFront() {
         for (int i = 0; i < 2; i++) {
-            if (ds[i].getValue() < 950.0)
+            if (ds[i].getValue() < OBSTACLE_DISTANCE)
                 return true;
         }
+        return false;
+    }
+
+    /**
+     * Determina si el DistanceSensor trasero del vehículo detecta un obstáculo
+     * a distancia menor que OBSTACLE_DISTANCE.
+     * 
+     * @return true si hay obstaculo, false si no lo hay
+     */
+    private boolean hasObstacleBack() {
+        if (ds[2].getValue() < OBSTACLE_DISTANCE)
+            return true;
         return false;
     }
 
