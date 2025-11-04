@@ -3,22 +3,17 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/rocks/protos/Rock.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
 EXTERNPROTO "../protos/TractorAutonomo.proto"
 
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.20974875107675076 -0.26298590513616904 0.9417238847568076 4.877790170514096
-  position 6.173124165600591 7.3605145746095495 9.746489642443864
+  orientation 0.09361659425106988 0.09161067587548348 -0.991384596080889 1.6010740549177933
+  position 10.715465709358188 8.037256512467007 4.403062144751633
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
-}
-Floor {
-  name "floor(1)"
-  size 50 50
 }
 Rock {
   translation 21.8697 -10.674 0.67
@@ -120,4 +115,28 @@ TractorAutonomo {
       ]
     }
   ]
+}
+DEF FLOOR Solid {
+  children [
+    DEF PLANE_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/default/worlds/textures/dry_grass.jpg"
+          ]
+        }
+        roughness 1
+        metalness 0
+        textureTransform TextureTransform {
+          scale 200 200
+        }
+      }
+      geometry Plane {
+        size 50 50
+      }
+      castShadows FALSE
+    }
+  ]
+  name "floor"
+  boundingObject USE PLANE_SHAPE
 }

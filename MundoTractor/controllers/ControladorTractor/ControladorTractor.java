@@ -6,7 +6,7 @@ public class ControladorTractor {
 
     //DetectarSensores.detectar();
 
-    tractor.avanzar(10, 20);
+    //tractor.avanzar(10, 20);
     tractor.girar(Math.PI/2);
   }
 }
