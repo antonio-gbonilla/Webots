@@ -1,0 +1,39 @@
+#VRML_SIM R2023b utf8
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/default/worlds/textures/dry_grass.jpg"
+
+PROTO Suelo [
+  field SFVec3f    translation 0 0 0
+  field SFRotation rotation    0 0 1 0
+  field SFVec2f    size        50 50
+  field SFString   name        "floor"
+]
+{
+  Solid {
+    translation IS translation
+    rotation IS rotation
+    children [
+      Shape {
+        appearance PBRAppearance {
+          baseColorMap ImageTexture {
+            url [
+              "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/default/worlds/textures/dry_grass.jpg"
+            ]
+          }
+          roughness 1
+          metalness 0
+          textureTransform TextureTransform {
+            scale 200 200
+          }
+        }
+        geometry Plane {
+          size IS size
+        }
+        castShadows FALSE
+      }
+    ]
+    name IS name
+    boundingObject Plane {
+      size IS size
+    }
+  }
+}
