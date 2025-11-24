@@ -1,0 +1,8 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "c:\\Users\\Antonio\\Desktop\\UPM\\TFG\\antlr-4.13.2-complete.jar",
+        "c:\\Users\\Antonio\\Desktop\\UPM\\TFG\\Controller.jar",
+        "c:\\Users\\Antonio\\Desktop\\UPM\\TFG\\vehicle.jar"
+    ]
+}

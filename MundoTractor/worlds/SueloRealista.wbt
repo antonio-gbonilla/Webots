@@ -7,10 +7,17 @@ EXTERNPROTO "../protos/TractorAutonomo.proto"
 EXTERNPROTO "../protos/Suelo.proto"
 
 WorldInfo {
+  title "TractorAutonomo"
+  ERP 0.7
+  contactProperties [
+    ContactProperties {
+      softCFM 0.0001
+    }
+  ]
 }
 Viewpoint {
-  orientation 0.2634292433131006 0.3420887326040574 -0.9019868806101544 1.4133104666380105
-  position 0.5628190663546455 39.08355462806752 29.823970418597266
+  orientation 0.2051994782928176 0.5778516360210508 -0.7899244652852263 0.8449391990069248
+  position -0.2155672966999873 -0.7891031869690739 9.662566252984105
 }
 TexturedBackground {
 }
@@ -65,15 +72,38 @@ DEF WALL_4 Solid {
   boundingObject USE WALL_SHAPE
 }
 TractorAutonomo {
-  translation 10.5771 -10.2868 0.609
+  hidden position_0_0 8.63186578245189e-06
+  hidden position2_0_0 -1.8075552812895536e-05
+  hidden position_0_1 -8.631856818368894e-06
+  hidden position2_0_1 -1.8074704776643075e-05
+  hidden position_0_2 4.0911828616066334e-05
+  hidden position_0_3 4.091171572702026e-05
+  hidden linearVelocity_0 0.00044732621124563563 1.3696700024363723e-09 0.00015347872956489105
+  hidden angularVelocity_0 -1.810403396017487e-09 0.0002954090490411271 -2.5391849258519665e-11
+  hidden rotation_1 9.03785441887867e-06 9.037743208123616e-06 0.9999999999183182 1.5707913682158992
+  hidden linearVelocity_1 5.241472915058434e-05 6.855060901072389e-07 0.00012043090803482711
+  hidden angularVelocity_1 -1.7226220901332558e-06 0.00043443182149907286 -1.4077747465434665e-05
+  hidden rotation_2 -9.037274379320862e-06 -9.037319192128066e-06 0.9999999999183272 1.570808631938491
+  hidden linearVelocity_2 5.241492001689175e-05 -6.839809998664537e-07 0.0001204319994158317
+  hidden angularVelocity_2 1.7193811131217758e-06 0.00043443175623850627 1.4077768149147559e-05
+  hidden rotation_3 -2.0455914302326757e-05 -2.0455839163695946e-05 0.999999999581557 1.570800000418443
+  hidden linearVelocity_3 0.0004687721821509313 -1.0846797865458898e-06 -0.00011527217901378695
+  hidden angularVelocity_3 1.3986766210256063e-06 0.0007349892232848313 9.422382431969551e-06
+  hidden rotation_4 2.045585785780376e-05 2.0455782719380287e-05 0.9999999995815593 1.5708000004184406
+  hidden linearVelocity_4 0.000468768786533445 1.08579402048159e-06 -0.00011527240999083949
+  hidden angularVelocity_4 -1.4011162343599397e-06 0.0007349847144489311 -9.422368531554329e-06
+  translation 10.551417337862848 -10.286800006346322 0.5045416607213425
+  rotation 1.2463518714654816e-07 0.9999999999999922 9.207450154824898e-09 0.09305692400856662
+  color 0 0.666667 0
   controller "ControladorTractor"
   sensorSlot [
     DistanceSensor {
-      translation 4.13 0.33 0.7
+      translation 2.36 0.25 0.45
+      rotation 0 1 0 -0.13
       children [
         DEF DEF_FormaDS Shape {
           geometry Box {
-            size 0.01 0.02 0.03
+            size 0.01 0.05 0.07
           }
         }
       ]
@@ -81,7 +111,8 @@ TractorAutonomo {
       boundingObject USE DEF_FormaDS
     }
     DistanceSensor {
-      translation 4.13 -0.33 0.7
+      translation 2.36 -0.25 0.45
+      rotation 0 1 0 -0.13
       children [
         USE DEF_FormaDS
       ]
@@ -89,7 +120,8 @@ TractorAutonomo {
       boundingObject USE DEF_FormaDS
     }
     DistanceSensor {
-      translation -2 0 0.5
+      translation -0.27 0 0.5
+      rotation 0 1 0 3.0116
       children [
         USE DEF_FormaDS
       ]
@@ -97,7 +129,7 @@ TractorAutonomo {
       boundingObject USE DEF_FormaDS
     }
     InertialUnit {
-      name "orientacion"
+      name "rumbo"
     }
     GPS {
       translation 1.6 0 0.79
@@ -115,6 +147,9 @@ TractorAutonomo {
         }
       ]
     }
+  ]
+  recognitionColors [
+    0 0 0
   ]
 }
 Suelo {

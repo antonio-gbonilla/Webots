@@ -13,7 +13,7 @@ public class TractorAutonomo extends Car {
     private int timeStep;
 
     // Valor maximo para que los distance sensor indiquen que hay un obstaculo
-    private final double OBSTACLE_DISTANCE = 950.0;
+    private final double OBSTACLE_DISTANCE = 990;
 
     // Maxima velocidad de los motores de las ruedas
     private double MAX_VELOCITY = 7.0;
@@ -21,8 +21,8 @@ public class TractorAutonomo extends Car {
     // Sensores de distancia del vehículo. Tiene 2 en la parte delantera.
     private DistanceSensor[] ds;
 
-    // Variable para sacar la orientacion del tractor
-    private InertialUnit orientacion;
+    // Variable para sacar la rumbo del tractor
+    private InertialUnit rumbo;
 
     /**
      * Proporciona las cordenadas del vehiculo
@@ -36,7 +36,7 @@ public class TractorAutonomo extends Car {
     public TractorAutonomo() {
         super();
         timeStep = (int) getBasicTimeStep(); // Se corta la parte decima 1.9 = 1
-        initSesores();
+        initSesores(); ///!FIJAR LAS CORDENADAS DEL TRACTOR AL ARRANCAR, TANGO ANGULOS, COMO POSICION
         esperar(500); // Da un tiempo para que se inicialicen los sensores.
     }
 
@@ -53,9 +53,9 @@ public class TractorAutonomo extends Car {
             ds[i].enable(timeStep);
         }
 
-        // Habilitamos la orientacion
-        orientacion = getInertialUnit("orientacion");
-        orientacion.enable(timeStep);
+        // Habilitamos la rumbo
+        rumbo = getInertialUnit("rumbo");
+        rumbo.enable(timeStep);
 
         // Habilitamos el GPS
         gps = getGPS("gps");
@@ -125,8 +125,9 @@ public class TractorAutonomo extends Car {
      */
 
     public void girar(double angle) {
-        double startYaw = anguloActual(); // Ángulo inicial del tractor (radianes)
-        double anguloRotado = 0.0; // Ángulo acumulado que el tractor ha girado
+
+        double rumboInicial = rumboActual(); // Rumbo inicial del tractor (radianes)
+        double rumboRotado = 0.0; // Rumbo acumulado que el tractor ha girado
 
         setCruisingSpeed(2.0);
 
@@ -151,21 +152,21 @@ public class TractorAutonomo extends Car {
                 frenar();
                 return; // Sale del metodo no solo del bucle while
             }
-            // Leo la orientacion actual a cada step y la normalizo para que este entre [-π,
+            // Leo la rumbo actual a cada step y la normalizo para que este entre [-π,
             // π)
-            double currentYaw = anguloActual();
+            double rumboActual = rumboActual();
 
             // Calcular el cambio angular desde el último paso
-            double delta = Apoyo.normalizeAngle(currentYaw - startYaw);
-            anguloRotado += delta;
-            startYaw = currentYaw;
+            double delta = Apoyo.normalizeAngle(rumboActual - rumboInicial);
+            rumboRotado += delta;
+            rumboInicial = rumboActual;
 
             // (opcional) debug en consola
             System.out.printf("Yaw actual: %.2f | Girado: %.2f/%.2f%n",
-                    currentYaw, anguloRotado, angle);
+                    rumboActual, rumboRotado, angle);
 
             // Si ya alcanzamos el ángulo deseado, salimos del bucle
-            if (Math.abs(anguloRotado) >= Math.abs(angle)) {
+            if (Math.abs(rumboRotado) >= Math.abs(angle)) {
                 break;
             }
         }
@@ -264,11 +265,11 @@ public class TractorAutonomo extends Car {
         System.out.println("------------------------------------\n --------------------\n----------------");
 
         // 4. Orientarse hacia el objeto
-        double anguloActual = anguloActual();
-        double diferenciaAngular = Apoyo.normalizeAngle(anguloHaciaObjetivo - anguloActual);
+        double rumboActual = rumboActual();
+        double diferenciaAngular = Apoyo.normalizeAngle(anguloHaciaObjetivo - rumboActual);
 
         System.out.printf("Orientación actual: %.2f rad | Diferencia angular: %.2f rad%n",
-                anguloActual, diferenciaAngular);
+                rumboActual, diferenciaAngular);
 
         // Solo girar si la diferencia es significativa
         if (Math.abs(diferenciaAngular) > 0.05) { // Umbral de ~2.8 grados
@@ -318,8 +319,8 @@ public class TractorAutonomo extends Car {
      * 
      * @return angulo actual de las ruedas (eje y)
      */
-    private double anguloActual() {
-        double[] rpy = orientacion.getRollPitchYaw();
+    private double rumboActual() {
+        double[] rpy = rumbo.getRollPitchYaw();
         return Apoyo.normalizeAngle(rpy[2]);
     }
 
