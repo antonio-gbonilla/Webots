@@ -13,7 +13,7 @@ public class TractorAutonomo extends Car {
     private int timeStep;
 
     // Valor maximo para que los distance sensor indiquen que hay un obstaculo
-    private final double OBSTACLE_DISTANCE = 990;
+    private final double OBSTACLE_DISTANCE = 2000;
 
     // Maxima velocidad de los motores de las ruedas
     private double MAX_VELOCITY = 7.0;
@@ -43,7 +43,7 @@ public class TractorAutonomo extends Car {
     private void initSesores() {
         ds = new DistanceSensor[3];
         String[] nombreDS = { "ds_left", "ds_right", "ds_trasero" };
-        for (int i = 0; i < ds.length; i++) {
+        for (int i = 0; i < (ds.length-1); i++) {
             ds[i] = getDistanceSensor(nombreDS[i]);
             /**
              * Activa cada sensor para que comience a tomar lecturas periódicas.
