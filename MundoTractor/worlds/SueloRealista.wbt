@@ -16,8 +16,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.010847775739660084 -0.012341266544081202 -0.9998650003383406 1.4425584614446132
-  position 7.130491055058737 5.944532237330769 1.76828065191954
+  orientation 0.3141705256132767 0.3646168688509577 -0.8765565696435119 1.5536309902305514
+  position 3.5204633279773176 7.459950938353715 13.734688294475731
 }
 TexturedBackground {
 }
@@ -72,11 +72,21 @@ DEF WALL_4 Solid {
   boundingObject USE WALL_SHAPE
 }
 TractorAutonomo {
-  translation 10.5514 -10.2868 0.609
+  translation 0 -10.2868 0.609
   rotation 0 0.9999999999999922 0 0.13
   color 0 0.666667 0
   controller "ControladorTractor"
   sensorSlot [
+    RangeFinder {
+      translation 2.44 0 0.45
+      rotation 0 1 0 -0.13
+      name "rf_front"
+      fieldOfView 0.35
+      height 1
+      near 0.1
+      minRange 0.1
+      maxRange 3
+    }
     DistanceSensor {
       translation 2.36 0.25 0.45
       rotation 0 1 0 -0.13
@@ -97,15 +107,6 @@ TractorAutonomo {
         USE DEF_FormaDS
       ]
       name "ds_right"
-      boundingObject USE DEF_FormaDS
-    }
-    DistanceSensor {
-      translation -0.27 0 0.5
-      rotation 0 1 0 3.0116
-      children [
-        USE DEF_FormaDS
-      ]
-      name "ds_trasero"
       boundingObject USE DEF_FormaDS
     }
     InertialUnit {

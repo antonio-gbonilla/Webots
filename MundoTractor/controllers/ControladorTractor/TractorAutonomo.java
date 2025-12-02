@@ -1,11 +1,12 @@
 import com.cyberbotics.webots.controller.DistanceSensor;
 import com.cyberbotics.webots.controller.GPS;
 import com.cyberbotics.webots.controller.InertialUnit;
+import com.cyberbotics.webots.controller.RangeFinder;
 import com.cyberbotics.webots.controller.vehicle.Car;
 
 /**
- * Clase que representa un tractor autónomo en Webots.
- * Extiende de Car y contiene métodos para controlar su movimiento.
+ * Clase que representa un tractor autonomo en Webots.
+ * Extiende de Car y contiene metodos para controlar su movimiento.
  */
 public class TractorAutonomo extends Car {
 
@@ -18,8 +19,12 @@ public class TractorAutonomo extends Car {
     // Maxima velocidad de los motores de las ruedas
     private double MAX_VELOCITY = 7.0;
 
-    // Sensores de distancia del vehículo. Tiene 2 en la parte delantera.
+    // Sensores de distancia del vehiculo. Tiene 2 en la parte delantera.
     private DistanceSensor[] ds;
+
+    // Sensores de distancia2 del vehiculo.
+    private RangeFinder rf;
+
 
     // Variable para sacar la rumbo del tractor
     private InertialUnit rumbo;
@@ -31,7 +36,7 @@ public class TractorAutonomo extends Car {
 
     /**
      * Constructor de TractorAutonomo.
-     * Inicializa la instancia y obtiene el timeStep de la simulación.
+     * Inicializa la instancia y obtiene el timeStep de la simulacion.
      */
     public TractorAutonomo() {
         super();
@@ -41,18 +46,7 @@ public class TractorAutonomo extends Car {
     }
 
     private void initSesores() {
-        ds = new DistanceSensor[3];
-        String[] nombreDS = { "ds_left", "ds_right", "ds_trasero" };
-        for (int i = 0; i < (ds.length-1); i++) {
-            ds[i] = getDistanceSensor(nombreDS[i]);
-            /**
-             * Activa cada sensor para que comience a tomar lecturas periódicas.
-             * Si no habilitas el sensor, getValue() siempre devuelve 0 porque el sensor “no
-             * está encendido”.
-             */
-            ds[i].enable(timeStep);
-        }
-
+  
         // Habilitamos la rumbo
         rumbo = getInertialUnit("rumbo");
         rumbo.enable(timeStep);
@@ -61,18 +55,21 @@ public class TractorAutonomo extends Car {
         gps = getGPS("gps");
         gps.enable(timeStep);
 
+        //Habilitar RangeFinder
+        rf= getRangeFinder("rf_front");
+        rf.enable(timeStep);
     }
 
     /**
      * Detiene el tractor completamente usando freno realista.
      */
     public void frenar() {
-        // Aplica freno al máximo
+        // Aplica freno al maximo
         setBrakeIntensity(1.0);
         setCruisingSpeed(0.0);
         setSteeringAngle(0.0); // ruedas rectas
 
-        // Mantiene la simulación unos pasos para asegurar que se detenga
+        // Mantiene la simulacion unos pasos para asegurar que se detenga
         esperar(timeStep);
 
         // Desactiva el freno para permitir futuros movimientos
@@ -81,26 +78,19 @@ public class TractorAutonomo extends Car {
 
     /**
      * Hace que el tractor retroceda durante 1 segundo,
-     * pero se detiene inmediatamente si detecta un obstáculo trasero.
+     * pero se detiene inmediatamente si detecta un obstaculo trasero.
      */
     public void marchaAtras() {
-        System.out.println("Iniciando marcha atrás...");
+        System.out.println("Iniciando marcha atras...");
 
         setSteeringAngle(0.0);
-        setCruisingSpeed(-3.0); // velocidad negativa = marcha atrás
+        setCruisingSpeed(-3.0); // velocidad negativa = marcha atras
 
-        int tiempoTotal = 5000; // duración total en ms
+        int tiempoTotal = 5000; // duracion total en ms
         int tiempoTranscurrido = 0;
 
         while (step(timeStep) != -1) {
             tiempoTranscurrido += timeStep;
-
-            // Comprobamos si hay obstáculo detrás
-            if (hasObstacleBack()) {
-                System.out.println("Obstáculo detectado detrás. Deteniendo marcha atrás.");
-                frenar();
-                return;
-            }
 
             if (tiempoTranscurrido >= tiempoTotal) {
                 break;
@@ -108,20 +98,20 @@ public class TractorAutonomo extends Car {
         }
 
         frenar();
-        System.out.println("Marcha atrás completada sin obstáculos.");
+        System.out.println("Marcha atras completada sin obstaculos.");
     }
 
     /**
      * 
-     * Realiza un giro controlado del tractor hasta alcanzar el ángulo
+     * Realiza un giro controlado del tractor hasta alcanzar el angulo
      * especificado.
-     * Este método utiliza la lectura del sensor de orientación (InertialUnit) para
-     * calcular el cambio acumulado en el ángulo de orientación del vehículo (yaw)
+     * Este metodo utiliza la lectura del sensor de orientacion (InertialUnit) para
+     * calcular el cambio acumulado en el angulo de orientacion del vehiculo (yaw)
      * y continuar girando hasta que el tractor haya rotado exactamente el valor
-     * indicado por parámetro.
+     * indicado por parametro.
      * 
-     * @param angle Ángulo de giro deseado en radianes. Se interpreta como un valor
-     *              relativo respecto a la orientación actual del tractor.
+     * @param angle angulo de giro deseado en radianes. Se interpreta como un valor
+     *              relativo respecto a la orientacion actual del tractor.
      */
 
     public void girar(double angle) {
@@ -132,9 +122,9 @@ public class TractorAutonomo extends Car {
         setCruisingSpeed(2.0);
 
         /**
-         * IMPORTANTE: setSteeringAngle(angle) no "coloca" el vehículo en un ángulo
+         * IMPORTANTE: setSteeringAngle(angle) no "coloca" el vehiculo en un angulo
          * absoluto,
-         * sino que indica cuánto giran las ruedas mientras avanza (curvatura de la
+         * sino que indica cuanto giran las ruedas mientras avanza (curvatura de la
          * trayectoria).
          */
         double steering;
@@ -148,7 +138,7 @@ public class TractorAutonomo extends Car {
 
         while (step(timeStep) != -1) {
             if (hasObstacleFront()) {
-                System.out.println("Obstáculo detectado. Deteniendo el tractor...");
+                System.out.println("Obstaculo detectado. Deteniendo el tractor...");
                 frenar();
                 return; // Sale del metodo no solo del bucle while
             }
@@ -156,7 +146,7 @@ public class TractorAutonomo extends Car {
             // π)
             double rumboActual = rumboActual();
 
-            // Calcular el cambio angular desde el último paso
+            // Calcular el cambio angular desde el ultimo paso
             double delta = Apoyo.normalizeAngle(rumboActual - rumboInicial);
             rumboRotado += delta;
             rumboInicial = rumboActual;
@@ -165,7 +155,7 @@ public class TractorAutonomo extends Car {
             System.out.printf("Yaw actual: %.2f | Girado: %.2f/%.2f%n",
                     rumboActual, rumboRotado, angle);
 
-            // Si ya alcanzamos el ángulo deseado, salimos del bucle
+            // Si ya alcanzamos el angulo deseado, salimos del bucle
             if (Math.abs(rumboRotado) >= Math.abs(angle)) {
                 break;
             }
@@ -179,30 +169,30 @@ public class TractorAutonomo extends Car {
     }
 
     /**
-     * Mantiene la simulación activa durante el tiempo especificado.
+     * Mantiene la simulacion activa durante el tiempo especificado.
      * 
-     * @param durationMs Duración en milisegundos
+     * @param durationMs Duracion en milisegundos
      */
     private void esperar(int durationMs) {
         int steps = (int) (durationMs / timeStep); // Calcula cuantos pasos tiene que dar a partir del tiempo
         for (int i = 0; i < steps; i++) {
             if (step(timeStep) == -1)
-                break; // sale del bucle for si la simulación termina
+                break; // sale del bucle for si la simulacion termina
         }
     }
 
     /**
-     * Hace avanzar el tractor a una velocidad específica hasta recorrer una
+     * Hace avanzar el tractor a una velocidad especifica hasta recorrer una
      * distancia determinada.
-     * El método controla el movimiento del tractor mediante el GPS para medir la
+     * El metodo controla el movimiento del tractor mediante el GPS para medir la
      * distancia recorrida
      * desde el punto de inicio hasta que alcanza la distancia objetivo.
      * 
      * @param velocidad Velocidad deseada para el avance en m/s. Si excede
      *                  MAX_VELOCITY,
-     *                  se limita automáticamente a dicho valor máximo.
-     * @param distancia Distancia objetivo a recorrer en metros. El método se
-     *                  detendrá
+     *                  se limita automaticamente a dicho valor maximo.
+     * @param distancia Distancia objetivo a recorrer en metros. El metodo se
+     *                  detendra
      *                  cuando el tractor haya recorrido esta distancia.
      */
     public void avanzar(double velocidad, double distancia) {
@@ -215,14 +205,14 @@ public class TractorAutonomo extends Car {
         while (step(timeStep) != -1) {
 
             if (hasObstacleFront()) {
-                System.out.println("Obstáculo detectado. Deteniendo el tractor...");
+                System.out.println("Obstaculo detectado. Deteniendo el tractor...");
                 frenar();
                 marchaAtras();
                 return; // Sale del metodo no solo del bucle while
             }
             double[] posicionActual = gps.getValues();
 
-            // Calcula cuánto se ha movido el robot desde su posición inicial.
+            // Calcula cuanto se ha movido el robot desde su posicion inicial.
             double distanciaRecorrida = Apoyo.distance(posicionInicial, posicionActual);
 
             System.out.printf("Distancia recorrida: %.2f / %.2f m%n", distanciaRecorrida, distancia);
@@ -236,28 +226,28 @@ public class TractorAutonomo extends Car {
     }
 
     public void irAPosicion(double targetX, double targetY, double targetZ, double velocidad) {
-        // 1. Obtener posición actual (reutilizando verificación GPS)
+        // 1. Obtener posicion actual (reutilizando verificacion GPS)
         double[] posicionActual = gps.getValues();
         double[] posicionObjetivo = { targetX, targetY, targetZ };
 
-        System.out.printf("Posición actual: [%.2f, %.2f, %.2f]%n",
+        System.out.printf("Posicion actual: [%.2f, %.2f, %.2f]%n",
                 posicionActual[0], posicionActual[1], posicionActual[2]);
-        System.out.printf("Posición objetivo: [%.2f, %.2f, %.2f]%n",
+        System.out.printf("Posicion objetivo: [%.2f, %.2f, %.2f]%n",
                 targetX, targetY, targetZ);
 
-        // 2. Calcular distancia al objetivo (reutilizando lógica de distancia)
+        // 2. Calcular distancia al objetivo (reutilizando logica de distancia)
         double distanciaAlObjetivo = Apoyo.distance(posicionActual, posicionObjetivo);
         System.out.printf("Distancia al objetivo: %.2f metros%n", distanciaAlObjetivo);
 
         // Si ya estamos muy cerca, no hacer nada
         if (distanciaAlObjetivo < 0.3) {
-            System.out.println("Ya está en la posición objetivo o muy cerca");
+            System.out.println("Ya esta en la posicion objetivo o muy cerca");
             return;
         }
 
-        // 3. Calcular ángulo hacia el objetivo
+        // 3. Calcular angulo hacia el objetivo
         double anguloHaciaObjetivo = Apoyo.calcularAnguloHaciaObjetivo(posicionActual, posicionObjetivo);
-        System.out.printf("Ángulo hacia el objetivo: %.2f radianes (%.2f grados)%n",
+        System.out.printf("angulo hacia el objetivo: %.2f radianes (%.2f grados)%n",
                 anguloHaciaObjetivo, Math.toDegrees(anguloHaciaObjetivo));
 
         System.out.println("------------------------------------\n --------------------\n----------------");
@@ -268,7 +258,7 @@ public class TractorAutonomo extends Car {
         double rumboActual = rumboActual();
         double diferenciaAngular = Apoyo.normalizeAngle(anguloHaciaObjetivo - rumboActual);
 
-        System.out.printf("Orientación actual: %.2f rad | Diferencia angular: %.2f rad%n",
+        System.out.printf("Orientacion actual: %.2f rad | Diferencia angular: %.2f rad%n",
                 rumboActual, diferenciaAngular);
 
         // Solo girar si la diferencia es significativa
@@ -276,43 +266,29 @@ public class TractorAutonomo extends Car {
             System.out.println("Girando hacia el objetivo...");
             girar(diferenciaAngular);
         } else {
-            System.out.println("Ya está orientado hacia el objetivo");
+            System.out.println("Ya esta orientado hacia el objetivo");
         }
 
         // 5. Avanzar hasta la posicion objetivo
         System.out.println("Avanzando hacia el objetivo...");
         avanzar(velocidad, distanciaAlObjetivo);
 
-        System.out.println("¡Posición objetivo alcanzada!");
+        System.out.println("¡Posicion objetivo alcanzada!");
 
     }
 
-    /**
-     * termina si alguno de los DistanceSensor delanteros del vehículo detecta un
-     * obstáculo
-     * a distancia menor que OBSTACLE_DISTANCE.
-     * 
-     * @return true si hay obstaculo, false si no lo hay
-     */
     private boolean hasObstacleFront() {
-        for (int i = 0; i < 2; i++) {
-            if (ds[i].getValue() < OBSTACLE_DISTANCE)
-                return true;
-        }
-        return false;
-    }
+    float[] depth = rf.getRangeImage();
+    int center = depth.length / 2;
 
-    /**
-     * Determina si el DistanceSensor trasero del vehículo detecta un obstáculo
-     * a distancia menor que OBSTACLE_DISTANCE.
-     * 
-     * @return true si hay obstaculo, false si no lo hay
-     */
-    private boolean hasObstacleBack() {
-        if (ds[2].getValue() < OBSTACLE_DISTANCE)
+    int window = 5;  // píxeles alrededor del centro
+    for (int i = center - window; i <= center + window; i++) {
+        if (depth[i] < OBSTACLE_DISTANCE)
             return true;
-        return false;
     }
+    return false;
+}
+
 
     /**
      * Obtenemos el angulo en el que esta orientado el robot en la simulacion

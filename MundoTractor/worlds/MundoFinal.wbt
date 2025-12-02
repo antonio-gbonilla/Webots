@@ -3,25 +3,28 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/rocks/protos/Rock.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
 EXTERNPROTO "../protos/TractorAutonomo.proto"
+EXTERNPROTO "../protos/Suelo.proto"
 
 WorldInfo {
+  title "TractorAutonomo"
+  ERP 0.7
+  contactProperties [
+    ContactProperties {
+      softCFM 0.0001
+    }
+  ]
 }
 Viewpoint {
-  orientation -0.20974875107675076 -0.26298590513616904 0.9417238847568076 4.877790170514096
-  position 6.173124165600591 7.3605145746095495 9.746489642443864
+  orientation -0.107422326769391 0.9001067216954638 0.4222183478605528 0.5509724544666412
+  position -18.833060570627445 -22.147906152482264 16.46722594996707
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
 }
-Floor {
-  name "floor(1)"
-  size 50 50
-}
 Rock {
-  translation 21.8697 -10.674 0.67
+  translation 16.4503 -2.22104 0.67
   name "rock(3)"
   scale 15
 }
@@ -69,39 +72,36 @@ DEF WALL_4 Solid {
   boundingObject USE WALL_SHAPE
 }
 TractorAutonomo {
-  translation 10.5771 -10.2868 0.609
+  translation 0 -10.2868 0.609
+  rotation 0 0.9999999999999922 0 0.13
+  color 0 0.666667 0
   controller "ControladorTractor"
   sensorSlot [
-    DistanceSensor {
-      translation 4.13 0.33 0.7
+    RangeFinder {
+      translation 2.36 0 0.45
+      rotation 0 1 0 -0.13
       children [
-        DEF DEF_FormaDS Shape {
+        DEF RANGE_FINDER_SHAPE Shape {
+          appearance PBRAppearance {
+            baseColor 1 0 0
+            roughness 1
+            metalness 0
+          }
           geometry Box {
-            size 0.01 0.02 0.03
+            size 0.01 0.05 0.07
           }
         }
       ]
-      name "ds_left"
-      boundingObject USE DEF_FormaDS
-    }
-    DistanceSensor {
-      translation 4.13 -0.33 0.7
-      children [
-        USE DEF_FormaDS
-      ]
-      name "ds_right"
-      boundingObject USE DEF_FormaDS
-    }
-    DistanceSensor {
-      translation -2 0 0.5
-      children [
-        USE DEF_FormaDS
-      ]
-      name "ds_trasero"
-      boundingObject USE DEF_FormaDS
+      name "rf_front"
+      boundingObject USE RANGE_FINDER_SHAPE
+      fieldOfView 0.35
+      height 1
+      near 0.1
+      minRange 0.1
+      maxRange 3
     }
     InertialUnit {
-      name "orientacion"
+      name "rumbo"
     }
     GPS {
       translation 1.6 0 0.79
@@ -119,5 +119,30 @@ TractorAutonomo {
         }
       ]
     }
+    Pen {
+      translation -0.36 0 -0.16
+      children [
+        DEF LAPIZ_FORMA Shape {
+          appearance PBRAppearance {
+            baseColor 1 0.666667 0
+            roughness 1
+            metalness 0
+          }
+          geometry Cylinder {
+            height 1
+            radius 0.05
+          }
+        }
+      ]
+      name "lapiz"
+      boundingObject USE LAPIZ_FORMA
+      inkDensity 1
+      leadSize 0.02
+    }
   ]
+  recognitionColors [
+    0 0 0
+  ]
+}
+Suelo {
 }

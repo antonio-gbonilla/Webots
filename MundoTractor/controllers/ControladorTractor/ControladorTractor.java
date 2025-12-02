@@ -1,7 +1,7 @@
 public class ControladorTractor {
 
   public static void main(String[] args) {
-    // Crear el tractor autónomo
+    // Crear el tractor autonomo
     TractorAutonomo tractor = new TractorAutonomo();
 
     //DetectarSensores.detectar();
