@@ -16,8 +16,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.008780410663270115 0.9996195725367873 0.0261460243623159 0.6485289719242247
-  position -19.480809536718972 -14.033003238713325 22.03298752655772
+  orientation 0.07339891601515836 0.9611550945039101 -0.26607044825944004 0.5589588770081294
+  position -21.83189218878039 -9.748489000566153 16.666656126256804
 }
 TexturedBackground {
 }
@@ -74,7 +74,8 @@ DEF WALL_4 Solid {
 TractorAutonomo {
   translation 0 -10.2868 0.609
   rotation 0 0.9999999999999922 0 0.13
-  color 0 0.666667 0
+  color 0.12549 0.45098 0.0509804
+  name "Tractor"
   controller "ControladorTractor"
   sensorSlot [
     RangeFinder {
@@ -98,26 +99,13 @@ TractorAutonomo {
       height 1
       near 0.1
       minRange 0.1
-      maxRange 3
+      maxRange 10
     }
     InertialUnit {
       name "rumbo"
     }
     GPS {
       translation 1.6 0 0.79
-      children [
-        Shape {
-          appearance PBRAppearance {
-            baseColor 0.52549 0.584314 0.784314
-            roughness 1
-            metalness 0
-          }
-          geometry Cone {
-            bottomRadius 0.01
-            height 0.01
-          }
-        }
-      ]
     }
     Pen {
       translation -0.36 0 -0.16
