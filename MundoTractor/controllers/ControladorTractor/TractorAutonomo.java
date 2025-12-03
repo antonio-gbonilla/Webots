@@ -1,4 +1,3 @@
-import com.cyberbotics.webots.controller.DistanceSensor;
 import com.cyberbotics.webots.controller.GPS;
 import com.cyberbotics.webots.controller.InertialUnit;
 import com.cyberbotics.webots.controller.RangeFinder;
@@ -14,17 +13,13 @@ public class TractorAutonomo extends Car {
     private int timeStep;
 
     // Valor maximo para que los distance sensor indiquen que hay un obstaculo
-    private final double OBSTACLE_DISTANCE = 2000;
+    private final double DISTANCIA_OBSTACULO = 2;
 
     // Maxima velocidad de los motores de las ruedas
     private double MAX_VELOCITY = 7.0;
 
-    // Sensores de distancia del vehiculo. Tiene 2 en la parte delantera.
-    private DistanceSensor[] ds;
-
     // Sensores de distancia2 del vehiculo.
     private RangeFinder rf;
-
 
     // Variable para sacar la rumbo del tractor
     private InertialUnit rumbo;
@@ -41,12 +36,12 @@ public class TractorAutonomo extends Car {
     public TractorAutonomo() {
         super();
         timeStep = (int) getBasicTimeStep(); // Se corta la parte decima 1.9 = 1
-        initSesores(); ///!FIJAR LAS CORDENADAS DEL TRACTOR AL ARRANCAR, TANGO ANGULOS, COMO POSICION
+        initSesores(); /// !FIJAR LAS CORDENADAS DEL TRACTOR AL ARRANCAR, TANGO ANGULOS, COMO POSICION
         esperar(500); // Da un tiempo para que se inicialicen los sensores.
     }
 
     private void initSesores() {
-  
+
         // Habilitamos la rumbo
         rumbo = getInertialUnit("rumbo");
         rumbo.enable(timeStep);
@@ -55,8 +50,8 @@ public class TractorAutonomo extends Car {
         gps = getGPS("gps");
         gps.enable(timeStep);
 
-        //Habilitar RangeFinder
-        rf= getRangeFinder("rf_front");
+        // Habilitar RangeFinder
+        rf = getRangeFinder("rf_front");
         rf.enable(timeStep);
     }
 
@@ -137,7 +132,7 @@ public class TractorAutonomo extends Car {
         setSteeringAngle(steering);
 
         while (step(timeStep) != -1) {
-            if (hasObstacleFront()) {
+            if (hasObstaculoDelante()) {
                 System.out.println("Obstaculo detectado. Deteniendo el tractor...");
                 frenar();
                 return; // Sale del metodo no solo del bucle while
@@ -204,7 +199,7 @@ public class TractorAutonomo extends Car {
 
         while (step(timeStep) != -1) {
 
-            if (hasObstacleFront()) {
+            if (hasObstaculoDelante()) {
                 System.out.println("Obstaculo detectado. Deteniendo el tractor...");
                 frenar();
                 marchaAtras();
@@ -277,18 +272,39 @@ public class TractorAutonomo extends Car {
 
     }
 
-    private boolean hasObstacleFront() {
-    float[] depth = rf.getRangeImage();
-    int center = depth.length / 2;
+    /**
+     * Comprueba si existe un obstáculo en la parte frontal del vehículo utilizando
+     * los datos del sensor RangeFinder.
+     * 
+     * El método analiza una ventana de píxeles situada alrededor del punto central
+     * de la imagen que detecta. Cada píxel representa la distancia medida en
+     * metros en una dirección concreta dentro del campo de visión del sensor.
+     * Si cualquiera de los píxeles dentro de esta ventana detecta una distancia
+     * menor que {@code DISTANCIA_OBSTACULO}, se considera que hay un obstáculo por
+     * delante.
+     * 
+     *
+     * @return {@code true} si se detecta un obstáculo a una distancia menor que {@code DISTANCIA_OBSTACULO}; 
+     *         {@code false} en caso contrario.
+     */
+    private boolean hasObstaculoDelante() {
+        //1. Lee la imagen de profundidad
+        float[] profundidad = rf.getRangeImage(); // imagen de distancias
+        //2. Calcula el píxel central (frontal)
+        int centro = profundidad.length / 2; 
 
-    int window = 5;  // píxeles alrededor del centro
-    for (int i = center - window; i <= center + window; i++) {
-        if (depth[i] < OBSTACLE_DISTANCE)
-            return true;
+        /*
+        3. En vez de usar solo un rayo, usa un rango:
+                center - 5 hasta center + 5 → 11 rayos.
+        4. Si cualquiera de esos rayos ve un objeto cerca → devuelve true.
+         */
+        int ventana = 5; // número de píxeles a izquierda y derecha del centro     
+        for (int i = centro - ventana; i <= centro + ventana; i++) {
+            if (profundidad[i] < DISTANCIA_OBSTACULO)
+                return true;
+        }
+        return false;
     }
-    return false;
-}
-
 
     /**
      * Obtenemos el angulo en el que esta orientado el robot en la simulacion
