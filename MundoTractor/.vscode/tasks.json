@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Webots: Compilar ControladorTractor (javac)",
+            "type": "shell",
+            "command": "javac",
+            "options": {
+                "cwd": "${workspaceFolder}/controllers/ControladorTractor"
+            },
+            "args": [
+                "-encoding",
+                "UTF-8",
+                "-cp",
+                "C:\\Program Files\\Webots\\lib\\controller\\java\\Controller.jar;C:\\Program Files\\Webots\\lib\\controller\\java\\vehicle.jar;.",
+                "*.java"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

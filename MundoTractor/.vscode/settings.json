@@ -1,7 +1,5 @@
 {
     "java.project.referencedLibraries": [
-        "lib/**/*.jar",
-        "c:\\Users\\Antonio\\Desktop\\UPM\\TFG\\Controller.jar",
-        "c:\\Users\\Antonio\\Desktop\\UPM\\TFG\\vehicle.jar"
+        "C:/Users/Antonio/lib/*.jar"
     ]
 }
