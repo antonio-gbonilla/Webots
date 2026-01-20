@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Webots: Compilar ControladorTractor (javac)",
+            "label": "Webots: Compilar ControladorTractor",
             "type": "shell",
             "command": "javac",
             "options": {
@@ -19,6 +19,21 @@
                 "kind": "build",
                 "isDefault": true
             },
+            "problemMatcher": []
+        },
+        {
+            "label": "Webots: Limpiar .class ControladorTractor",
+            "type": "shell",
+            "command": "cmd",
+            "options": {
+                "cwd": "${workspaceFolder}/controllers/ControladorTractor"
+            },
+            "args": [
+                "/c",
+                "del",
+                "/q",
+                "*.class"
+            ],
             "problemMatcher": []
         }
     ]

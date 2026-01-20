@@ -196,3 +196,173 @@ En VSCode, dentro de la carpeta `Controller`, se crean los controladores que per
 - **Apoyo.java:** Contiene todos los metodos que se utilizan varias veces dentro de la clase `TractorAutonomo` y que se pueden llevar a una clase externa.
 
 La compilación se realiza incluyendo las librerías `controller.jar` y `vehicle.jar`:
+
+# Desde el terminal
+
+Para ejecutar **Webots desde la terminal** en Windows, es recomendable **añadir al PATH** la ruta:
+
+`C:\Program Files\Webots\msys64\mingw64\bin`
+
+Así se puede lanzar `webots` directamente sin escribir la ruta completa al ejecutable.  
+Si no se añade al PATH, hay que usar la ruta completa a `webots.exe`.
+
+---
+
+### Opciones importantes de ejecución
+
+- `--stdout`: redirige la salida estándar de los controladores.
+
+- `--stderr`: redirige la salida de errores.
+
+- `--minimize`: inicia Webots minimizado y sin pantalla de bienvenida (ideal para scripts).
+
+**Comando típico recomendado (con PATH configurado):**
+
+`webots --minimize --stdout --stderr <mundo.wbt>`
+
+---
+
+### Formas de lanzar Webots y sus efectos
+
+#### 1️⃣ Ejecución directa
+
+`webots --minimize --stdout --stderr <mundo.wbt>`
+
+- ❌ El terminal queda bloqueado
+
+- ✅ Se ve `stdout` y `stderr`
+
+- 🔁 El control vuelve al cerrar Webots
+
+---
+
+#### 2️⃣ Usando `start`
+
+`start "" webots --minimize --stdout --stderr <mundo.wbt>`
+
+- ✅ El terminal queda libre
+
+- ✅ Webots corre en otro proceso
+
+- ⚠️ La salida no se maneja bien en consola (mejor redirigir a archivo)
+
+---
+
+#### 3️⃣ Usando `webotsw`
+
+`webotsw --minimize <mundo.wbt>`
+
+- ✅ El terminal queda libre inmediatamente
+
+- ❌ No muestra salida en consola
+
+- ✔️ Ideal para ejecución silenciosa o automática
+
+---
+
+#### 4️⃣ Usando `start /B` (opción recomendada)
+
+Abre un proceso hijo en ese terminal y es lo que realmente se ejecuta:
+
+`start "" /B webots --minimize --stdout --stderr <mundo.wbt> > log.txt 2>&1`
+
+- ✅ El terminal sigue usable
+
+- ✅ `stdout` y `stderr` funcionan correctamente
+
+- ⚠️ Si se cierra el `cmd`, Webots puede cerrarse
+
+- ✔️ Buen equilibrio entre control y automatización`
+
+# Integración Webots + VS Code (Java)
+
+## Tasks y Launch
+
+### Objetivo
+
+Poder **trabajar solo desde VS Code** y que:
+
+1. El controlador Java se **compile automáticamente**
+
+2. Al pulsar **▶ Run** desde el panel de la izquierda de **ejecución y depuración** seleccionando la opción de `"Webots ▶ MundoFinal (minimize + stdout/stderr)"`, se **abra Webots**
+
+3. Se cargue el mundo `MundoFinal.wbt`
+
+4. La salida `stdout / stderr` del controlador aparezca en **el terminal de VS Code**
+
+5. El comportamiento sea equivalente a ejecutar en `cmd`:
+   
+   `webots --minimize --stdout --stderr`
+
+---
+
+### Estructura del proyecto
+
+```bash
+<proyecto>
+├─ controllers/
+│  └─ ControladorTractor/
+│     └─ ControladorTractor.java
+│
+├─ worlds/
+│  └─ MundoFinal.wbt
+│
+└─ .vscode/
+   ├─ tasks.json
+   └─ launch.json
+
+```
+
+---
+
+## tasks.json — Compilación del controlador
+
+### Función
+
+Automatizar la compilación del controlador Java con `javac`, igual que se hacía a mano en el terminal.
+
+### Qué hace
+
+- Ejecuta `javac` desde la carpeta del controlador
+
+- Usa el classpath de Webots (`Controller.jar` y `vehicle.jar`)
+
+- Genera los `.class` donde Webots los espera
+
+- Se ejecuta automáticamente antes del Run
+
+### Archivo `.vscode/tasks.json`
+
+### Uso
+
+- `Ctrl + Shift + B` → compila el controlador
+
+- También se ejecuta automáticamente desde `launch.json`
+
+---
+
+## launch.json — Ejecutar Webots desde VS Code
+
+### Función
+
+Hacer que el botón **▶ Run** de VS Code:
+
+1. Compile el controlador
+
+2. Arranque Webots
+
+3. Cargue el mundo `MundoFinal.wbt`
+
+4. Redirija `stdout` y `stderr` al terminal de VS Code
+
+### Cómo se consigue
+
+- Se lanza `webots.exe` a través de `cmd.exe`
+
+- Se pasan los flags `--minimize --stdout --stderr`
+
+- Se usa `preLaunchTask` para compilar antes
+
+### Archivo `.vscode/launch.json`
+
+

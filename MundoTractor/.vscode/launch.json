@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Webots ▶ MundoFinal (minimize + stdout/stderr)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "preLaunchTask": "Webots: Compilar ControladorTractor",
+            "program": "C:\\Windows\\System32\\cmd.exe",
+            "args": [
+                "/c",
+                "webots",
+                "--minimize",
+                "--stdout",
+                "--stderr",
+                "${workspaceFolder}\\worlds\\MundoFinal.wbt"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        }
+    ]
+}
